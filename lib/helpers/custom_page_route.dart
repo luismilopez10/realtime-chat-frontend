@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 enum CustomDirection {
   toRight,
   toLeft,
+  toUp,
+  toDown,
 }
 
 class CustomPageRoute<T> extends PageRouteBuilder<T> {
@@ -15,9 +17,24 @@ class CustomPageRoute<T> extends PageRouteBuilder<T> {
   }) : super(
           pageBuilder: (context, animation, secondaryAnimation) => page,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            final begin = direction == CustomDirection.toRight
-                ? const Offset(1.0, 0.0)
-                : const Offset(-1.0, 0.0);
+            final Offset begin;
+            switch (direction) {
+              case CustomDirection.toRight:
+                begin = const Offset(1.0, 0.0);
+                break;
+              case CustomDirection.toLeft:
+                begin = const Offset(-1.0, 0.0);
+                break;
+              case CustomDirection.toUp:
+                begin = const Offset(0.0, 1.0);
+                break;
+              case CustomDirection.toDown:
+                begin = const Offset(0.0, -1.0);
+                break;
+              default:
+                begin = const Offset(1.0, 0.0);
+            }
+
             const end = Offset.zero;
             const curve = Curves.ease;
 
