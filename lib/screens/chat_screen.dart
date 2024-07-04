@@ -123,26 +123,64 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: Container(
               padding:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 14.0),
+                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
               decoration: BoxDecoration(
                 color: AppColors.instance.textFieldBackgroundColor,
                 borderRadius: BorderRadius.circular(50.0),
               ),
-              child: TextField(
-                controller: _textController,
-                onSubmitted: _handleSubmit,
-                onChanged: (_) {
-                  setState(() {});
-                },
-                cursorColor: AppColors.instance.sendMessageColor,
-                style: TextStyle(color: AppColors.instance.textColor),
-                decoration: InputDecoration.collapsed(
-                  hintText: 'Mensaje',
-                  hintStyle: TextStyle(
-                    color: AppColors.instance.greyColor,
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      print('Emojis');
+                    },
+                    child: Icon(
+                      Icons.emoji_emotions_outlined,
+                      color: AppColors.instance.greyColor,
+                      size: 22.0,
+                    ),
                   ),
-                ),
-                focusNode: _focusNode,
+                  const SizedBox(width: 10.0),
+                  Expanded(
+                    child: TextField(
+                      controller: _textController,
+                      onSubmitted: _handleSubmit,
+                      onChanged: (_) {
+                        setState(() {});
+                      },
+                      cursorColor: AppColors.instance.sendMessageColor,
+                      style: TextStyle(color: AppColors.instance.textColor),
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'Mensaje',
+                        hintStyle: TextStyle(
+                          color: AppColors.instance.greyColor,
+                        ),
+                      ),
+                      focusNode: _focusNode,
+                    ),
+                  ),
+                  // const SizedBox(width: 14.0),
+                  // GestureDetector(
+                  //   onTap: () {},
+                  //   child: Icon(
+                  //     Icons.attach_file,
+                  //     color: AppColors.instance.greyColor,
+                  // size: 14.0,
+                  //   ),
+                  // ),
+                  const SizedBox(width: 14.0),
+                  GestureDetector(
+                    onTap: () {
+                      print('Camera');
+                    },
+                    child: Icon(
+                      Icons.camera_alt_outlined,
+                      color: AppColors.instance.greyColor,
+                      size: 22.0,
+                    ),
+                  ),
+                  const SizedBox(width: 4.0),
+                ],
               ),
             ),
           ),
