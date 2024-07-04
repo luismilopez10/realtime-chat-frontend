@@ -125,7 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
               padding:
                   const EdgeInsets.symmetric(vertical: 10.0, horizontal: 14.0),
               decoration: BoxDecoration(
-                color: AppColors.instance.appBarColor,
+                color: AppColors.instance.textFieldBackgroundColor,
                 borderRadius: BorderRadius.circular(50.0),
               ),
               child: TextField(
@@ -136,10 +136,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
                 cursorColor: AppColors.instance.sendMessageColor,
                 style: TextStyle(color: AppColors.instance.textColor),
-                decoration: const InputDecoration.collapsed(
+                decoration: InputDecoration.collapsed(
                   hintText: 'Mensaje',
                   hintStyle: TextStyle(
-                    color: Colors.grey,
+                    color: AppColors.instance.greyColor,
                   ),
                 ),
                 focusNode: _focusNode,
