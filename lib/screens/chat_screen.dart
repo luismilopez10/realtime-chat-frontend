@@ -39,7 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: AppColors.instance.backgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.instance.greyDark,
+        backgroundColor: AppColors.instance.appBarColor,
         elevation: 1,
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -125,7 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
               padding:
                   const EdgeInsets.symmetric(vertical: 10.0, horizontal: 14.0),
               decoration: BoxDecoration(
-                color: AppColors.instance.greyDark,
+                color: AppColors.instance.appBarColor,
                 borderRadius: BorderRadius.circular(50.0),
               ),
               child: TextField(
@@ -134,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 onChanged: (_) {
                   setState(() {});
                 },
-                cursorColor: AppColors.instance.greenLight,
+                cursorColor: AppColors.instance.sendMessageColor,
                 style: TextStyle(color: AppColors.instance.textColor),
                 decoration: const InputDecoration.collapsed(
                   hintText: 'Mensaje',
@@ -158,7 +158,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
               decoration: BoxDecoration(
                 color: _textController.text.isNotEmpty
-                    ? AppColors.instance.greenLight
+                    ? AppColors.instance.sendMessageColor
                     : Colors.grey,
                 borderRadius: BorderRadius.circular(50.0),
               ),

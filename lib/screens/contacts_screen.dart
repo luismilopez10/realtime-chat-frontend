@@ -37,7 +37,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           style: TextStyle(color: Colors.white),
         ),
         elevation: 1,
-        backgroundColor: AppColors.instance.greyDark,
+        backgroundColor: AppColors.instance.appBarColor,
         leading: IconButton(
           icon: const Icon(
             Icons.exit_to_app,

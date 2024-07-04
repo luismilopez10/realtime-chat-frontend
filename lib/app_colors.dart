@@ -1,41 +1,35 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  final Color green;
-  final Color myMessageColor;
-  final Color greenLight;
-  final Color blueDark;
-  final Color greyDark;
-  final Color notMyMessageColor;
+  final Color appBarColor;
   final Color backgroundColor;
+  final Color myMessageColor;
+  final Color notMyMessageColor;
+  final Color sendMessageColor;
   final Color textColor;
-  final Color messageSeen;
+  final Color messageSeenColor;
 
   static AppColors? _instance;
 
   AppColors._({
-    required this.green,
-    required this.myMessageColor,
-    required this.greenLight,
-    required this.blueDark,
-    required this.greyDark,
-    required this.notMyMessageColor,
+    required this.appBarColor,
     required this.backgroundColor,
+    required this.myMessageColor,
+    required this.notMyMessageColor,
+    required this.sendMessageColor,
     required this.textColor,
-    required this.messageSeen,
+    required this.messageSeenColor,
   });
 
   factory AppColors.whatsapp() {
     _instance = AppColors._(
-      green: const Color(0xFF25D366),
-      myMessageColor: const Color(0xFF005C4B),
-      greenLight: const Color(0xFF21C15F),
-      blueDark: const Color(0xFF0B141B),
-      greyDark: const Color(0xFF1F2C34),
-      notMyMessageColor: const Color(0xFF202C33),
+      appBarColor: const Color(0xFF1F2C34),
       backgroundColor: const Color(0xFF09141A),
+      myMessageColor: const Color(0xFF005C4B),
+      notMyMessageColor: const Color(0xFF202C33),
+      sendMessageColor: const Color(0xFF21C15F),
       textColor: const Color(0xFFECE5DD),
-      messageSeen: const Color(0xFF34B7F1),
+      messageSeenColor: const Color(0xFF34B7F1),
     );
     return _instance!;
   }
@@ -44,7 +38,7 @@ class AppColors {
   //   _instance = AppColors._(
   //     green: const Color.fromARGB(255, 37, 162, 211),
   //     greenLight: const Color.fromARGB(255, 81, 33, 193),
-  //     blueDark: const Color(0xFF0B141B),
+  //     appBarColor: const Color(0xFF0B141B),
   //   );
   //   return _instance!;
   // }
