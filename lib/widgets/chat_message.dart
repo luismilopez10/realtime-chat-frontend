@@ -53,10 +53,13 @@ class _MessageContainer extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
           child: Text(
             text,
-            style: TextStyle(color: AppColors.instance.textColor),
+            style: TextStyle(
+              color: AppColors.instance.textColor,
+              fontSize: 15.0,
+            ),
           ),
           // _HourAndCheck(isMyMessage: isMyMessage),
         ),
@@ -84,7 +87,7 @@ class _HourAndCheck extends StatelessWidget {
               '6:47 p. m.',
               style: TextStyle(
                 color: AppColors.instance.textColor.withOpacity(0.6),
-                fontSize: 11.0,
+                fontSize: 12.0,
               ),
             ),
             if (isMyMessage)

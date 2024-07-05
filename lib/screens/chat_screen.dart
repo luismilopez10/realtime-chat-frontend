@@ -22,16 +22,20 @@ class _ChatScreenState extends State<ChatScreen> {
   final FocusNode _focusNode = FocusNode();
 
   final List<ChatMessage> _messages = [
-    const ChatMessage(userId: '1', text: 'Hola, buenas tardes'),
-    const ChatMessage(userId: '2', text: 'Hola'),
-    const ChatMessage(userId: '1', text: 'Cómo vas?'),
-    const ChatMessage(userId: '2', text: 'Bn bn y tú?'),
-    const ChatMessage(userId: '1', text: 'Muy bien'),
+    const ChatMessage(userId: '2', text: 'Mmmm toca mirar'),
     const ChatMessage(
         userId: '1',
         text:
             'Oye sabes cómo puedo poner un texto muy muy largo en una caja de Text?'),
-    const ChatMessage(userId: '2', text: 'Mmmm toca mirar'),
+    const ChatMessage(
+        userId: '1',
+        text: 'Muy bien oqiwj doqiwj doiqj wodij qwod qoiwj doqij wd'),
+    const ChatMessage(userId: '2', text: 'Bn bn y tú? qoiwj doqijw doijq wod'),
+    const ChatMessage(
+        userId: '1', text: 'Cómo vas? woidjq owijd qoiwjd oqiw doq woidj '),
+    const ChatMessage(userId: '2', text: 'Hola aoi daoijw daoiwjd awd oaiwjd '),
+    const ChatMessage(
+        userId: '1', text: 'Hola, buenas tardes oawdh oaiwjd aoiwjd '),
   ];
 
   @override
@@ -91,22 +95,27 @@ class _ChatScreenState extends State<ChatScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 18.0),
                     child: ListView.builder(
                       itemCount: _messages.length,
-                      itemBuilder: (_, i) => Column(
-                        children: [
-                          if (i > 0 &&
-                              _messages[i - 1].userId != _messages[1].userId)
-                            const SizedBox(height: 8.0),
-                          _messages[i],
-                        ],
-                      ),
+                      itemBuilder: (_, i) {
+                        bool isFirstMessage = i == 0;
+                        bool isLastMessage = i == _messages.length - 1;
+                        bool isNextMessageFromDifferentUser =
+                            i < _messages.length - 1 &&
+                                _messages[i].userId != _messages[i + 1].userId;
+
+                        return Column(
+                          children: [
+                            if (isLastMessage || isNextMessageFromDifferentUser)
+                              const SizedBox(height: 8.0),
+                            _messages[i],
+                            if (isFirstMessage) const SizedBox(height: 8.0),
+                          ],
+                        );
+                      },
                       reverse: true,
                     ),
                   ),
                 ),
-                Container(
-                  color: Colors.transparent,
-                  child: _inputChat(),
-                ),
+                _inputChat(),
               ],
             ),
           ],
@@ -117,6 +126,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _inputChat() {
     return Container(
+      color: Colors.transparent,
       margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
       child: Row(
         children: [
@@ -137,26 +147,28 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Icon(
                       Icons.emoji_emotions_outlined,
                       color: AppColors.instance.greyColor,
-                      size: 22.0,
+                      size: 24.0,
                     ),
                   ),
                   const SizedBox(width: 10.0),
                   Expanded(
                     child: TextField(
                       controller: _textController,
+                      focusNode: _focusNode,
                       onSubmitted: _handleSubmit,
-                      onChanged: (_) {
-                        setState(() {});
-                      },
+                      onChanged: (_) => setState(() {}),
                       cursorColor: AppColors.instance.sendMessageColor,
-                      style: TextStyle(color: AppColors.instance.textColor),
+                      textCapitalization: TextCapitalization.sentences,
+                      style: TextStyle(
+                        color: AppColors.instance.textColor,
+                        fontSize: 17.0,
+                      ),
                       decoration: InputDecoration.collapsed(
                         hintText: 'Mensaje',
                         hintStyle: TextStyle(
                           color: AppColors.instance.greyColor,
                         ),
                       ),
-                      focusNode: _focusNode,
                     ),
                   ),
                   // const SizedBox(width: 14.0),
@@ -176,7 +188,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Icon(
                       Icons.camera_alt_outlined,
                       color: AppColors.instance.greyColor,
-                      size: 22.0,
+                      size: 24.0,
                     ),
                   ),
                   const SizedBox(width: 4.0),
@@ -202,6 +214,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               child: Icon(
                 Icons.send_rounded,
+                size: 27.0,
                 color: _textController.text.isNotEmpty
                     ? Colors.black
                     : Colors.black54,
