@@ -9,7 +9,7 @@ class AppColors {
   final Color textColor;
   final Color messageSeenColor;
   final Color textFieldBackgroundColor;
-  final Color greyColor;
+  final Color deactivatedColor;
 
   static AppColors? _instance;
 
@@ -22,7 +22,7 @@ class AppColors {
     required this.textColor,
     required this.messageSeenColor,
     required this.textFieldBackgroundColor,
-    required this.greyColor,
+    required this.deactivatedColor,
   });
 
   factory AppColors.whatsapp() {
@@ -36,19 +36,25 @@ class AppColors {
       textColor: const Color(0xFFECE5DD),
       messageSeenColor: const Color(0xFF34B7F1),
       textFieldBackgroundColor: const Color(0xFF1F2C34),
-      greyColor: const Color(0xFF84959D),
+      deactivatedColor: const Color(0xFF84959D),
     );
     return _instance!;
   }
 
-  // factory AppColors.telegram() {
-  //   _instance = AppColors._(
-  //     green: const Color.fromARGB(255, 37, 162, 211),
-  //     greenLight: const Color.fromARGB(255, 81, 33, 193),
-  //     appBarColor: const Color(0xFF0B141B),
-  //   );
-  //   return _instance!;
-  // }
+  factory AppColors.telegram() {
+    _instance = AppColors._(
+      appBarColor: const Color(0xFF1F2C34),
+      backgroundColor: const Color(0xFF09141A),
+      myMessageColor: const Color(0xFF005C4B),
+      notMyMessageColor: const Color(0xFF202C33),
+      sendMessageColor: const Color(0xFF21C15F),
+      textColor: const Color(0xFFECE5DD),
+      messageSeenColor: const Color(0xFF34B7F1),
+      textFieldBackgroundColor: const Color(0xFF1F2C34),
+      deactivatedColor: const Color(0xFF84959D),
+    );
+    return _instance!;
+  }
 
   static AppColors get instance {
     if (_instance == null) {

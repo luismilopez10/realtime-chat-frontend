@@ -22,20 +22,17 @@ class _ChatScreenState extends State<ChatScreen> {
   final FocusNode _focusNode = FocusNode();
 
   final List<ChatMessage> _messages = [
+    const ChatMessage(userId: '2', text: 'Porque la verdad, no sé'),
     const ChatMessage(userId: '2', text: 'Mmmm toca mirar'),
     const ChatMessage(
         userId: '1',
         text:
             'Oye sabes cómo puedo poner un texto muy muy largo en una caja de Text?'),
-    const ChatMessage(
-        userId: '1',
-        text: 'Muy bien oqiwj doqiwj doiqj wodij qwod qoiwj doqij wd'),
-    const ChatMessage(userId: '2', text: 'Bn bn y tú? qoiwj doqijw doijq wod'),
-    const ChatMessage(
-        userId: '1', text: 'Cómo vas? woidjq owijd qoiwjd oqiw doq woidj '),
-    const ChatMessage(userId: '2', text: 'Hola aoi daoijw daoiwjd awd oaiwjd '),
-    const ChatMessage(
-        userId: '1', text: 'Hola, buenas tardes oawdh oaiwjd aoiwjd '),
+    const ChatMessage(userId: '1', text: 'Muy bien'),
+    const ChatMessage(userId: '2', text: 'Bn bn y tú?'),
+    const ChatMessage(userId: '1', text: 'Cómo vas?'),
+    const ChatMessage(userId: '2', text: 'Hola'),
+    const ChatMessage(userId: '1', text: 'Hola, buenas tardes'),
   ];
 
   @override
@@ -59,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
             CircleAvatar(
               maxRadius: 18.0,
               child: Text(
-                widget.user.name.substring(0, 2),
+                widget.user.name.substring(0, 1),
                 style: const TextStyle(
                   fontSize: 15.0,
                 ),
@@ -146,7 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                     child: Icon(
                       Icons.emoji_emotions_outlined,
-                      color: AppColors.instance.greyColor,
+                      color: AppColors.instance.deactivatedColor,
                       size: 24.0,
                     ),
                   ),
@@ -158,6 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       onSubmitted: _handleSubmit,
                       onChanged: (_) => setState(() {}),
                       cursorColor: AppColors.instance.sendMessageColor,
+                      keyboardType: TextInputType.text,
                       textCapitalization: TextCapitalization.sentences,
                       style: TextStyle(
                         color: AppColors.instance.textColor,
@@ -166,7 +164,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       decoration: InputDecoration.collapsed(
                         hintText: 'Mensaje',
                         hintStyle: TextStyle(
-                          color: AppColors.instance.greyColor,
+                          color: AppColors.instance.deactivatedColor,
                         ),
                       ),
                     ),
@@ -176,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   //   onTap: () {},
                   //   child: Icon(
                   //     Icons.attach_file,
-                  //     color: AppColors.instance.greyColor,
+                  //     color: AppColors.instance.deactivatedColor,
                   // size: 14.0,
                   //   ),
                   // ),
@@ -187,7 +185,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                     child: Icon(
                       Icons.camera_alt_outlined,
-                      color: AppColors.instance.greyColor,
+                      color: AppColors.instance.deactivatedColor,
                       size: 24.0,
                     ),
                   ),
@@ -235,7 +233,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _textController.clear();
     _focusNode.requestFocus();
 
-    final newMessage = ChatMessage(userId: '1', text: text);
+    final newMessage = ChatMessage(userId: '1', text: text.trimRight());
     _messages.insert(0, newMessage);
 
     setState(() {});

@@ -105,7 +105,7 @@ class _UserListTile extends StatelessWidget {
         style: const TextStyle(color: Colors.grey),
       ),
       leading: CircleAvatar(
-        child: Text(user.name.substring(0, 2)),
+        child: Text(user.name.substring(0, 1)),
       ),
       trailing: Container(
         width: 10.0,
