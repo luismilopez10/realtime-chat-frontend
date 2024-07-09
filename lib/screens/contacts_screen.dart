@@ -6,6 +6,8 @@ import 'package:realtime_chat/app_colors.dart';
 import 'package:realtime_chat/helpers/custom_page_route.dart';
 import 'package:realtime_chat/models/user.dart';
 import 'package:realtime_chat/screens/chat_screen.dart';
+import 'package:realtime_chat/screens/login_screen.dart';
+import 'package:realtime_chat/services/auth_service.dart';
 import 'package:realtime_chat/widgets/widgets.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -33,7 +35,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
       backgroundColor: AppColors.instance.backgroundColor,
       appBar: AppBar(
         title: const Text(
-          'Contacts',
+          'Contactos',
           style: TextStyle(color: Colors.white),
         ),
         elevation: 1,
@@ -43,7 +45,15 @@ class _ContactsScreenState extends State<ContactsScreen> {
             Icons.exit_to_app,
             color: Colors.white,
           ),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              CustomPageRoute(
+                page: const LoginScreen(),
+                direction: CustomDirection.toLeft,
+              ),
+            );
+            AuthService.deleteToken();
+          },
         ),
         actions: const [
           ConnectionStatusIcon(),
@@ -97,21 +107,21 @@ class _UserListTile extends StatelessWidget {
         ),
       ),
       title: Text(
-        user.name,
+        user.name!,
         style: const TextStyle(color: Colors.white),
       ),
       subtitle: Text(
-        user.email,
+        user.email!,
         style: const TextStyle(color: Colors.grey),
       ),
       leading: CircleAvatar(
-        child: Text(user.name.substring(0, 1)),
+        child: Text(user.name!.substring(0, 1)),
       ),
       trailing: Container(
         width: 10.0,
         height: 10.0,
         decoration: BoxDecoration(
-          color: user.online ? Colors.green[300] : Colors.red,
+          color: user.online! ? Colors.green[300] : Colors.red,
           borderRadius: BorderRadius.circular(10.0),
         ),
       ),

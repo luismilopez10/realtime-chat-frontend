@@ -56,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> {
             CircleAvatar(
               maxRadius: 18.0,
               child: Text(
-                widget.user.name.substring(0, 1),
+                widget.user.name!.substring(0, 1),
                 style: const TextStyle(
                   fontSize: 15.0,
                 ),
@@ -64,7 +64,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             const SizedBox(width: 10.0),
             Text(
-              widget.user.name,
+              widget.user.name!,
               style: TextStyle(
                 color: AppColors.instance.textColor,
                 fontSize: 18.0,

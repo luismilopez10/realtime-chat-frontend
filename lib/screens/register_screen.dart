@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:realtime_chat/helpers/show_alert.dart';
 
 import 'package:realtime_chat/screens/screens.dart';
+import 'package:realtime_chat/services/auth_service.dart';
 import 'package:realtime_chat/widgets/widgets.dart';
 import 'package:realtime_chat/helpers/custom_page_route.dart';
 
@@ -58,6 +61,8 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Column(
       children: [
         CustomInput(
@@ -83,12 +88,28 @@ class __FormState extends State<_Form> {
           obscureText: true,
         ),
         const SizedBox(height: 36.0),
-        BlueButton(
+        AuthenticationButton(
           text: 'Sign Up',
-          onPressed: () {
-            print(emailController.text);
-            print(passwordController.text);
-          },
+          loading: authService.authenticating,
+          onPressed: authService.authenticating
+              ? null
+              : () async {
+                  FocusScope.of(context).unfocus();
+                  final String? registerError = await authService.register(
+                      nameController.text.trim(),
+                      emailController.text.trim(),
+                      passwordController.text.trim());
+
+                  if (registerError == null) {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ContactsScreen(),
+                        ));
+                  } else {
+                    showAlert(context, 'Error en el registro', registerError);
+                  }
+                },
         ),
       ],
     );
