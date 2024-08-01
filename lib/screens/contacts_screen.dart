@@ -94,12 +94,6 @@ class _UserListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      // onTap: () => Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => ChatScreen(user: user),
-      //   ),
-      // ),
       onTap: () => Navigator.of(context).push(
         CustomPageRoute(
           page: ChatScreen(user: user),
@@ -115,7 +109,8 @@ class _UserListTile extends StatelessWidget {
         style: const TextStyle(color: Colors.grey),
       ),
       leading: CircleAvatar(
-        child: Text(user.name!.substring(0, 1)),
+        backgroundColor: Colors.grey[400],
+        child: const Icon(Icons.person),
       ),
       trailing: Container(
         width: 10.0,

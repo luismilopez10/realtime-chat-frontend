@@ -23,7 +23,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Chat App',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.instance.sendMessageColor),
           useMaterial3: true,
         ),
         home: const LoadingScreen(),
