@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as foundation;
-
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 import 'package:realtime_chat/app_colors.dart';
 import 'package:realtime_chat/models/user.dart';
@@ -23,7 +20,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  bool _emojiShowing = false;
 
   final List<ChatMessage> _messages = [
     const ChatMessage(userId: '2', text: 'Porque la verdad, no sé'),
@@ -40,40 +36,10 @@ class _ChatScreenState extends State<ChatScreen> {
   ];
 
   @override
-  void initState() {
-    // _focusNode.requestFocus();
-
-    _focusNode.addListener(
-      () {
-        if (_focusNode.hasFocus && _emojiShowing) {
-          setState(() {
-            _emojiShowing = false;
-          });
-        }
-      },
-    );
-
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
     super.dispose();
-  }
-
-  void _toggleEmojiPicker() async {
-    if (!_emojiShowing) {
-      _focusNode.unfocus(); // Hide keyboard
-      await Future.delayed(const Duration(milliseconds: 150));
-    } else {
-      FocusScope.of(context).requestFocus(_focusNode); // Show keyboard
-    }
-
-    _emojiShowing = !_emojiShowing;
-
-    setState(() {});
   }
 
   @override
@@ -181,15 +147,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      //* Botón de Emojis
-                      GestureDetector(
-                        onTap: _toggleEmojiPicker,
-                        child: Icon(
-                          Icons.emoji_emotions_outlined,
-                          color: AppColors.instance.deactivatedColor,
-                          size: 24.0,
-                        ),
-                      ),
                       const SizedBox(width: 10.0),
 
                       //* Caja de texto del mensaje
@@ -269,53 +226,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ],
-          ),
-        ),
-        if (_emojiShowing) _showEmojisFrame(),
-      ],
-    );
-  }
-
-  Widget _showEmojisFrame() {
-    return Column(
-      children: [
-        const SizedBox(height: 4.0),
-        Offstage(
-          offstage: !_emojiShowing,
-          child: EmojiPicker(
-            onEmojiSelected: (category, emoji) {
-              setState(() {});
-            },
-            textEditingController: _textController,
-            config: Config(
-              height: 280,
-              checkPlatformCompatibility: true,
-              emojiViewConfig: EmojiViewConfig(
-                emojiSizeMax: 28 *
-                    (foundation.defaultTargetPlatform == TargetPlatform.iOS
-                        ? 1.2
-                        : 1.0),
-              ),
-              swapCategoryAndBottomBar: false,
-              skinToneConfig:
-                  const SkinToneConfig(dialogBackgroundColor: Colors.red),
-              categoryViewConfig: CategoryViewConfig(
-                backgroundColor: AppColors.instance.textFieldBackgroundColor,
-                iconColorSelected: AppColors.instance.sendMessageColor,
-                indicatorColor: AppColors.instance.sendMessageColor,
-                dividerColor: AppColors.instance.sendMessageColor,
-              ),
-              bottomActionBarConfig: BottomActionBarConfig(
-                buttonColor: Colors.transparent,
-                backgroundColor: AppColors.instance.textFieldBackgroundColor,
-                // enabled: false,
-              ),
-              searchViewConfig: SearchViewConfig(
-                backgroundColor: AppColors.instance.textFieldBackgroundColor,
-                buttonIconColor: AppColors.instance.textFieldBackgroundColor,
-                buttonColor: AppColors.instance.textFieldBackgroundColor,
-              ),
-            ),
           ),
         ),
       ],
