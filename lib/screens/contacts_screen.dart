@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -8,6 +9,8 @@ import 'package:realtime_chat/models/user.dart';
 import 'package:realtime_chat/screens/chat_screen.dart';
 import 'package:realtime_chat/screens/login_screen.dart';
 import 'package:realtime_chat/services/auth_service.dart';
+import 'package:realtime_chat/services/socket_service.dart';
+import 'package:realtime_chat/services/users_service.dart';
 import 'package:realtime_chat/widgets/widgets.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -20,17 +23,27 @@ class ContactsScreen extends StatefulWidget {
 }
 
 class _ContactsScreenState extends State<ContactsScreen> {
-  RefreshController _refreshController =
+  final usersService = UsersService();
+  List<User> users = [];
+  final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
-  final List<User> users = [
-    User(uid: '1', name: 'María', email: 'maria@test.com', online: true),
-    User(uid: '2', name: 'José', email: 'jose@test.com', online: false),
-    User(uid: '3', name: 'Steven', email: 'steven@test.com', online: true),
-  ];
+  @override
+  void initState() {
+    _loadUsers();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final socketService = Provider.of<SocketService>(context);
+
     return Scaffold(
       backgroundColor: AppColors.instance.backgroundColor,
       appBar: AppBar(
@@ -46,6 +59,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
             color: Colors.white,
           ),
           onPressed: () {
+            socketService.disconnect();
+
             Navigator.of(context).pushReplacement(
               CustomPageRoute(
                 page: const LoginScreen(),
@@ -79,27 +94,30 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   void _loadUsers() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
+    users = await usersService.getUsers();
+    setState(() {});
     _refreshController.refreshCompleted();
   }
 }
 
 class _UserListTile extends StatelessWidget {
+  final User user;
+
   const _UserListTile({
     required this.user,
   });
 
-  final User user;
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () => Navigator.of(context).push(
-        CustomPageRoute(
-          page: ChatScreen(user: user),
-          direction: CustomDirection.toRight,
-        ),
-      ),
+      onTap: () {
+        Navigator.of(context).push(
+          CustomPageRoute(
+            page: ChatScreen(user: user),
+            direction: CustomDirection.toRight,
+          ),
+        );
+      },
       title: Text(
         user.name!,
         style: const TextStyle(color: Colors.white),

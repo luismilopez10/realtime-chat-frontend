@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
 import 'package:realtime_chat/app_colors.dart';
 import 'package:realtime_chat/screens/screens.dart';
 import 'package:realtime_chat/services/auth_service.dart';
+import 'package:realtime_chat/services/chat_service.dart';
+import 'package:realtime_chat/services/socket_service.dart';
 
 void main() {
   AppColors.whatsapp();
@@ -18,13 +21,15 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => SocketService()),
+        ChangeNotifierProvider(create: (_) => ChatService()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Chat App',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColors.instance.sendMessageColor),
+          // colorScheme: ColorScheme.fromSeed(
+          //     seedColor: AppColors.instance.sendMessageColor),
           useMaterial3: true,
         ),
         home: const LoadingScreen(),

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+import 'package:emoji_regex/emoji_regex.dart';
+
 import 'package:realtime_chat/app_colors.dart';
+import 'package:realtime_chat/services/auth_service.dart';
 
 class ChatMessage extends StatelessWidget {
   final String userId;
@@ -14,9 +18,11 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 1.0),
-      child: userId == '1'
+      child: userId == authService.user.uid
           ? _MessageContainer(
               text: text,
               isMyMessage: true,
@@ -38,6 +44,12 @@ class _MessageContainer extends StatelessWidget {
     required this.isMyMessage,
   });
 
+  bool _isOnlyEmojis(String text) {
+    final emojiRegExp = emojiRegex();
+    final emojiMatches = emojiRegExp.allMatches(text);
+    return emojiMatches.length == text.runes.length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -58,13 +70,30 @@ class _MessageContainer extends StatelessWidget {
             text,
             style: TextStyle(
               color: AppColors.instance.textColor,
-              fontSize: 15.0,
+              fontSize: _getTextFontSize(text),
             ),
           ),
           // _HourAndCheck(isMyMessage: isMyMessage),
         ),
       ),
     );
+  }
+
+  double _getTextFontSize(String text) {
+    if (!_isOnlyEmojis(text)) {
+      return 15.0;
+    }
+
+    switch (text.runes.length) {
+      case 1:
+        return 32.0;
+      case 2:
+        return 22.0;
+      case 3:
+        return 20.0;
+      default:
+        return 17.0;
+    }
   }
 }
 

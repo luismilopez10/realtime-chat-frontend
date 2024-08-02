@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  final Color primaryColor;
+  final Color secondaryColor;
   final Color appBarColor;
   final Color backgroundColor;
   final Color myMessageColor;
@@ -14,6 +16,8 @@ class AppColors {
   static AppColors? _instance;
 
   AppColors._({
+    required this.primaryColor,
+    required this.secondaryColor,
     required this.appBarColor,
     required this.backgroundColor,
     required this.myMessageColor,
@@ -28,6 +32,8 @@ class AppColors {
   factory AppColors.whatsapp() {
     _instance = AppColors._(
       // appBarColor: const Color(0xFF0B141B),
+      primaryColor: const Color(0xFF21C15F),
+      secondaryColor: const Color(0xFF34B7F1),
       appBarColor: const Color(0xFF1F2C34),
       backgroundColor: const Color(0xFF09141A),
       myMessageColor: const Color(0xFF005C4B),
@@ -43,6 +49,8 @@ class AppColors {
 
   factory AppColors.telegram() {
     _instance = AppColors._(
+      primaryColor: const Color(0xFF21C15F),
+      secondaryColor: const Color(0xFF34B7F1),
       appBarColor: const Color(0xFF1F2C34),
       backgroundColor: const Color(0xFF09141A),
       myMessageColor: const Color(0xFF005C4B),

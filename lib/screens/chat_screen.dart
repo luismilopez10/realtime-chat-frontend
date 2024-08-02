@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:realtime_chat/app_colors.dart';
+import 'package:realtime_chat/models/messages_response.dart';
 import 'package:realtime_chat/models/user.dart';
+import 'package:realtime_chat/services/auth_service.dart';
+import 'package:realtime_chat/services/chat_service.dart';
+import 'package:realtime_chat/services/socket_service.dart';
 import 'package:realtime_chat/widgets/widgets.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -21,24 +26,57 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  final List<ChatMessage> _messages = [
-    const ChatMessage(userId: '2', text: 'Porque la verdad, no sé'),
-    const ChatMessage(userId: '2', text: 'Mmmm toca mirar'),
-    const ChatMessage(
-        userId: '1',
-        text:
-            'Oye sabes cómo puedo poner un texto muy muy largo en una caja de Text?'),
-    const ChatMessage(userId: '1', text: 'Muy bien'),
-    const ChatMessage(userId: '2', text: 'Bn bn y tú?'),
-    const ChatMessage(userId: '1', text: 'Cómo vas?'),
-    const ChatMessage(userId: '2', text: 'Hola'),
-    const ChatMessage(userId: '1', text: 'Hola, buenas tardes'),
-  ];
+  late SocketService socketService;
+  late ChatService chatService;
+  late AuthService authService;
+
+  final List<ChatMessage> _messages = [];
+
+  @override
+  void initState() {
+    socketService = Provider.of<SocketService>(context, listen: false);
+    authService = Provider.of<AuthService>(context, listen: false);
+    chatService = Provider.of<ChatService>(context, listen: false);
+
+    socketService.socket.on('private-message', _listenMessage);
+
+    _loadHistory(widget.user.uid!);
+
+    super.initState();
+  }
+
+  void _loadHistory(String userId) async {
+    List<Message> chat = await chatService.getChat(userId);
+
+    final history = chat.map((message) => ChatMessage(
+          userId: message.from!,
+          text: message.message!,
+        ));
+
+    setState(() {
+      _messages.insertAll(0, history);
+    });
+  }
+
+  void _listenMessage(dynamic payload) {
+    final receivedMessage = ChatMessage(
+      userId: payload['from'],
+      text: payload['message'],
+    );
+
+    setState(() {
+      _messages.insert(0, receivedMessage);
+    });
+  }
 
   @override
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
+
+    socketService.socket
+        .off('private-message'); //! Si se sale del chat, deja de escucharlo
+
     super.dispose();
   }
 
@@ -233,6 +271,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSubmit(String text) {
+    text = text.trimRight();
+
     if (text.isEmpty) {
       _focusNode.requestFocus();
       return;
@@ -241,9 +281,19 @@ class _ChatScreenState extends State<ChatScreen> {
     _textController.clear();
     _focusNode.requestFocus();
 
-    final newMessage = ChatMessage(userId: '1', text: text.trimRight());
+    final newMessage = ChatMessage(
+      userId: authService.user.uid!,
+      text: text,
+    );
+
     _messages.insert(0, newMessage);
 
     setState(() {});
+
+    socketService.emit('private-message', {
+      'from': authService.user.uid,
+      'to': widget.user.uid,
+      'message': text,
+    });
   }
 }

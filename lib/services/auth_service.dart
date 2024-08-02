@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -15,7 +16,9 @@ class AuthService with ChangeNotifier {
 
   static Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
-    return await storage.read(key: 'token');
+    final token = await storage.read(key: 'token');
+    log('$token', name: 'token');
+    return token;
   }
 
   static Future<void> deleteToken() async {
@@ -48,14 +51,18 @@ class AuthService with ChangeNotifier {
 
     authenticating = false;
 
+    log('${resp.statusCode}', name: 'statusCode');
+
     if (resp.statusCode == 200) {
       final loginResponse = loginResponseFromJson(resp.body);
       user = loginResponse.user!;
+      log('${loginResponse.token}', name: 'token');
 
       await _saveToken(loginResponse.token!);
       return null;
     }
 
+    log(resp.body, name: 'errorMessage');
     return getResponseErrors(resp.body);
   }
 
@@ -79,14 +86,18 @@ class AuthService with ChangeNotifier {
 
     authenticating = false;
 
+    log('${resp.statusCode}', name: 'statusCode');
+
     if (resp.statusCode == 200) {
       final loginResponse = loginResponseFromJson(resp.body);
       user = loginResponse.user!;
+      log('${loginResponse.token}', name: 'token');
 
       await _saveToken(loginResponse.token!);
       return null;
     }
 
+    log(resp.body, name: 'errorMessage');
     return getResponseErrors(resp.body);
   }
 
@@ -119,9 +130,12 @@ class AuthService with ChangeNotifier {
       },
     );
 
+    log('${resp.statusCode}', name: 'statusCode');
+
     if (resp.statusCode == 200) {
       final loginResponse = loginResponseFromJson(resp.body);
       user = loginResponse.user!;
+      log('${loginResponse.token}', name: 'renewToken');
 
       await _saveToken(loginResponse.token!);
       return true;

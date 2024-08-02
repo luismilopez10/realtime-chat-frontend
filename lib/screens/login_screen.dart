@@ -6,6 +6,7 @@ import 'package:realtime_chat/helpers/custom_page_route.dart';
 import 'package:realtime_chat/helpers/show_alert.dart';
 import 'package:realtime_chat/screens/screens.dart';
 import 'package:realtime_chat/services/auth_service.dart';
+import 'package:realtime_chat/services/socket_service.dart';
 import 'package:realtime_chat/widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -62,6 +63,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     return Column(
       children: [
@@ -92,6 +94,8 @@ class __FormState extends State<_Form> {
                       passwordController.text.trim());
 
                   if (loginError == null) {
+                    socketService.connect();
+
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
