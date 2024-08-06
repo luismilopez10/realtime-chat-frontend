@@ -141,6 +141,7 @@ class AuthService with ChangeNotifier {
       return true;
     }
 
+    log(resp.body, name: 'errorMessage');
     logout();
     return false;
   }

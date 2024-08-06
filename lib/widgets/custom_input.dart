@@ -21,7 +21,7 @@ class CustomInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 3.0, bottom: 3.0, right: 15.0),
+      padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30.0),
@@ -32,20 +32,28 @@ class CustomInput extends StatelessWidget {
               blurRadius: 5.0)
         ],
       ),
-      child: TextFormField(
-        controller: controller,
-        autocorrect: false,
-        keyboardType: keyboardType,
-        textCapitalization: textCapitalization,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon),
-          border: InputBorder.none,
-          hintText: hintText,
-          hintStyle: const TextStyle(
-            color: Colors.grey,
+      child: Row(
+        children: [
+          Icon(icon),
+          const SizedBox(width: 10.0),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              autocorrect: false,
+              keyboardType: keyboardType,
+              textCapitalization: textCapitalization,
+              obscureText: obscureText,
+              decoration: InputDecoration(
+                // prefixIcon: Icon(icon),
+                border: InputBorder.none,
+                hintText: hintText,
+                hintStyle: const TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
