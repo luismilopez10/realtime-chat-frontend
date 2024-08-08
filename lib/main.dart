@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:provider/provider.dart';
 
@@ -8,8 +10,15 @@ import 'package:realtime_chat/services/auth_service.dart';
 import 'package:realtime_chat/services/chat_service.dart';
 import 'package:realtime_chat/services/socket_service.dart';
 
-void main() {
+void main() async {
   AppColors.whatsapp();
+  // AppColors.telegram();
+
+  WidgetsFlutterBinding.ensureInitialized();
+  // Se Obtiene la configuración regional predeterminada del dispositivo
+  String locale = PlatformDispatcher.instance.locale.toString();
+  await initializeDateFormatting(locale, null);
+
   runApp(const MyApp());
 }
 

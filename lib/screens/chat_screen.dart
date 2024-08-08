@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:realtime_chat/app_colors.dart';
@@ -23,8 +24,8 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _textController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  final TextEditingController textController = TextEditingController();
+  final FocusNode focusNode = FocusNode();
 
   late SocketService socketService;
   late ChatService chatService;
@@ -34,6 +35,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
+    super.initState();
+
     socketService = Provider.of<SocketService>(context, listen: false);
     authService = Provider.of<AuthService>(context, listen: false);
     chatService = Provider.of<ChatService>(context, listen: false);
@@ -41,17 +44,16 @@ class _ChatScreenState extends State<ChatScreen> {
     socketService.socket.on('private-message', _listenMessage);
 
     _loadHistory(widget.user.uid!);
-
-    super.initState();
   }
 
   void _loadHistory(String userId) async {
     List<Message> chat = await chatService.getChat(userId);
 
-    final history = chat.map((message) => ChatMessage(
-          userId: message.from!,
-          text: message.message!,
-        ));
+    final history = chat.map((message) {
+      message.createdAt = message.createdAt!.toLocal();
+      message.updatedAt = message.updatedAt!.toLocal();
+      return ChatMessage(message: message);
+    }).toList();
 
     setState(() {
       _messages.insertAll(0, history);
@@ -59,10 +61,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _listenMessage(dynamic payload) {
-    final receivedMessage = ChatMessage(
-      userId: payload['from'],
-      text: payload['message'],
-    );
+    final receivedMessage = ChatMessage(message: Message.fromJson(payload));
+
+    receivedMessage.message.createdAt =
+        receivedMessage.message.createdAt!.toLocal();
+    receivedMessage.message.updatedAt =
+        receivedMessage.message.updatedAt!.toLocal();
 
     setState(() {
       _messages.insert(0, receivedMessage);
@@ -71,8 +75,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    _textController.dispose();
-    _focusNode.dispose();
+    textController.dispose();
+    focusNode.dispose();
 
     socketService.socket
         .off('private-message'); //! Si se sale del chat, deja de escucharlo
@@ -82,6 +86,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Locale locale = Localizations.localeOf(context);
+
     return Scaffold(
       backgroundColor: AppColors.instance.backgroundColor,
       appBar: AppBar(
@@ -93,9 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             IconButton(
               highlightColor: Colors.grey.withOpacity(0.2),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               icon: Icon(
                 Icons.arrow_back,
                 color: AppColors.instance.textColor,
@@ -120,6 +124,7 @@ class _ChatScreenState extends State<ChatScreen> {
       body: SafeArea(
         child: Stack(
           children: [
+            //* Background Image
             SizedBox(
               height: double.infinity,
               width: double.infinity,
@@ -129,34 +134,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: Colors.grey.withOpacity(0.2),
               ),
             ),
+
+            //* Chat
             Column(
               children: [
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                    child: ListView.builder(
-                      itemCount: _messages.length,
-                      itemBuilder: (_, i) {
-                        bool isFirstMessage = i == 0;
-                        bool isLastMessage = i == _messages.length - 1;
-                        bool isNextMessageFromDifferentUser =
-                            i < _messages.length - 1 &&
-                                _messages[i].userId != _messages[i + 1].userId;
-
-                        return Column(
-                          children: [
-                            if (isLastMessage || isNextMessageFromDifferentUser)
-                              const SizedBox(height: 8.0),
-                            _messages[i],
-                            if (isFirstMessage) const SizedBox(height: 8.0),
-                          ],
-                        );
-                      },
-                      reverse: true,
-                    ),
-                  ),
+                  child: _buildMessageList(locale),
                 ),
-                _inputChat(),
+                _buildInputChat(),
               ],
             ),
           ],
@@ -165,7 +150,82 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _inputChat() {
+  Padding _buildMessageList(Locale locale) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18.0),
+      child: ListView.builder(
+        itemCount: _messages.length,
+        itemBuilder: (_, i) {
+          bool isFirstMessage = i == 0;
+          bool isLastMessage = i == _messages.length - 1;
+          bool isNextMessageFromDifferentUser = !isLastMessage &&
+              _messages[i].message.from != _messages[i + 1].message.from;
+
+          final isFirstMessageOfTheDay = isLastMessage
+              ? true
+              : _messages[i]
+                      .message
+                      .createdAt!
+                      .difference(_messages[i + 1].message.createdAt!)
+                      .inDays !=
+                  0;
+
+          return Column(
+            children: [
+              if (isLastMessage) const SizedBox(height: 8.0),
+              if (isFirstMessageOfTheDay)
+                _buildDateHeader(_messages[i].message.createdAt!, locale),
+              if (isNextMessageFromDifferentUser) const SizedBox(height: 8.0),
+              _messages[i],
+              if (isFirstMessage) const SizedBox(height: 8.0),
+            ],
+          );
+        },
+        reverse: true,
+      ),
+    );
+  }
+
+  Widget _buildDateHeader(DateTime date, Locale locale) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      decoration: BoxDecoration(
+        color: AppColors.instance.notMyMessageColor,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+        child: Text(
+          _getMessageDate(date, locale),
+          style: TextStyle(
+            color: AppColors.instance.dateHeaderTextColor,
+            fontSize: 12.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getMessageDate(DateTime messageDate, Locale locale) {
+    final today = DateTime.now().toLocal();
+    final isSentToday = today.difference(messageDate).inDays == 0;
+    final isSentYesterday = today.difference(messageDate).inDays == 1;
+    final isSentWithinLastWeek = today.difference(messageDate).inDays < 6;
+
+    if (isSentToday) {
+      return 'Hoy';
+    } else if (isSentYesterday) {
+      return 'Ayer';
+    } else if (isSentWithinLastWeek) {
+      return DateFormat('EEEE', locale.toString()).format(messageDate);
+    }
+
+    return DateFormat('d \'de\' MMMM \'de\' yyyy', locale.toString())
+        .format(messageDate)
+        .toLowerCase();
+  }
+
+  Widget _buildInputChat() {
     return Column(
       children: [
         Container(
@@ -175,94 +235,12 @@ class _ChatScreenState extends State<ChatScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.instance.textFieldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const SizedBox(width: 10.0),
-
-                      //* Caja de texto del mensaje
-                      Expanded(
-                        child: Scrollbar(
-                          thickness: 2.5,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: TextField(
-                              maxLines: 6,
-                              minLines: 1,
-                              controller: _textController,
-                              focusNode: _focusNode,
-                              onSubmitted: _handleSubmit,
-                              cursorColor: AppColors.instance.sendMessageColor,
-                              keyboardType: TextInputType.text,
-                              textCapitalization: TextCapitalization.sentences,
-                              onChanged: (_) => setState(() {}),
-                              style: TextStyle(
-                                height: 1.25,
-                                color: AppColors.instance.textColor,
-                                fontSize: 17.0,
-                              ),
-                              decoration: InputDecoration.collapsed(
-                                hintText: 'Mensaje',
-                                hintStyle: TextStyle(
-                                  color: AppColors.instance.deactivatedColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14.0),
-
-                      //* Botón de Cámara
-                      InkWell(
-                        onTap: () {
-                          print('Camera');
-                        },
-                        child: Icon(
-                          Icons.camera_alt_outlined,
-                          color: AppColors.instance.deactivatedColor,
-                          size: 24.0,
-                        ),
-                      ),
-                      const SizedBox(width: 4.0),
-                    ],
-                  ),
-                ),
+                child: _buildTextField(),
               ),
               const SizedBox(width: 6.0),
 
               //* Botón de enviar mensaje
-              GestureDetector(
-                onTap: _textController.text.isNotEmpty
-                    ? () {
-                        _handleSubmit(_textController.text);
-                      }
-                    : null,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    color: _textController.text.isNotEmpty
-                        ? AppColors.instance.sendMessageColor
-                        : Colors.grey,
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                  child: Icon(
-                    Icons.send_rounded,
-                    size: 25.0,
-                    color: _textController.text.isNotEmpty
-                        ? Colors.black
-                        : Colors.black54,
-                  ),
-                ),
-              ),
+              _buildSendButton(),
             ],
           ),
         ),
@@ -270,20 +248,113 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  GestureDetector _buildSendButton() {
+    return GestureDetector(
+      onTap: textController.text.isNotEmpty
+          ? () {
+              _handleSubmit(textController.text);
+            }
+          : null,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+        decoration: BoxDecoration(
+          color: textController.text.isNotEmpty
+              ? AppColors.instance.sendMessageColor
+              : Colors.grey,
+          borderRadius: BorderRadius.circular(50.0),
+        ),
+        child: Icon(
+          Icons.send_rounded,
+          size: 25.0,
+          color: textController.text.isNotEmpty ? Colors.black : Colors.black54,
+        ),
+      ),
+    );
+  }
+
+  Container _buildTextField() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+      decoration: BoxDecoration(
+        color: AppColors.instance.textFieldBackgroundColor,
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const SizedBox(width: 10.0),
+
+          //* Caja de texto del mensaje
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2.0, bottom: 2.0, right: 8.0),
+              child: Scrollbar(
+                thickness: 3.0,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: TextField(
+                    maxLines: 6,
+                    minLines: 1,
+                    controller: textController,
+                    focusNode: focusNode,
+                    onSubmitted: _handleSubmit,
+                    cursorColor: AppColors.instance.sendMessageColor,
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.sentences,
+                    onChanged: (_) => setState(() {}),
+                    style: TextStyle(
+                      height: 1.25,
+                      color: AppColors.instance.textColor,
+                      fontSize: 17.0,
+                    ),
+                    decoration: InputDecoration.collapsed(
+                      hintText: 'Mensaje',
+                      hintStyle: TextStyle(
+                        color: AppColors.instance.deactivatedColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // const SizedBox(width: 14.0),
+
+          //* Botón de Cámara
+          // InkWell(
+          //   onTap: () {
+          //     print('Camera');
+          //   },
+          //   child: Icon(
+          //     Icons.camera_alt_outlined,
+          //     color: AppColors.instance.deactivatedColor,
+          //     size: 24.0,
+          //   ),
+          // ),
+          // const SizedBox(width: 4.0),
+        ],
+      ),
+    );
+  }
+
   void _handleSubmit(String text) {
     text = text.trimRight();
 
     if (text.isEmpty) {
-      _focusNode.requestFocus();
+      focusNode.requestFocus();
       return;
     }
 
-    _textController.clear();
-    _focusNode.requestFocus();
+    textController.clear();
+    focusNode.requestFocus();
 
     final newMessage = ChatMessage(
-      userId: authService.user.uid!,
-      text: text,
+      message: Message()
+        ..from = authService.user.uid
+        ..to = widget.user.uid
+        ..message = text
+        ..createdAt = DateTime.now()
+        ..updatedAt = DateTime.now(),
     );
 
     _messages.insert(0, newMessage);
