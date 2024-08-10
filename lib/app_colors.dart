@@ -10,6 +10,7 @@ class AppColors {
   final Color sendMessageColor;
   final Color textColor;
   final Color messageTimeTextColor;
+  final Color dateHeaderBackgroundColor;
   final Color dateHeaderTextColor;
   final Color messageSeenColor;
   final Color textFieldBackgroundColor;
@@ -27,6 +28,7 @@ class AppColors {
     required this.sendMessageColor,
     required this.textColor,
     required this.messageTimeTextColor,
+    required this.dateHeaderBackgroundColor,
     required this.dateHeaderTextColor,
     required this.messageSeenColor,
     required this.textFieldBackgroundColor,
@@ -45,6 +47,7 @@ class AppColors {
       sendMessageColor: const Color(0xFF21C15F),
       textColor: const Color(0xFFECE5DD),
       messageTimeTextColor: const Color(0xFFC0C0C0),
+      dateHeaderBackgroundColor: const Color(0xFF202C33),
       dateHeaderTextColor: const Color(0xFFCACACA),
       messageSeenColor: const Color(0xFF34B7F1),
       textFieldBackgroundColor: const Color(0xFF1F2C34),
@@ -64,6 +67,7 @@ class AppColors {
       sendMessageColor: const Color(0xFF24A1DE),
       textColor: const Color(0xFFECE5DD),
       messageTimeTextColor: const Color(0xFFC0C0C0),
+      dateHeaderBackgroundColor: const Color(0xFF202C33),
       dateHeaderTextColor: const Color(0xFFCACACA),
       messageSeenColor: const Color(0xFF34B7F1),
       textFieldBackgroundColor: const Color(0xFF1F2C34),

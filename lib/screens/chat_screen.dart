@@ -73,6 +73,12 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
   @override
   void dispose() {
     textController.dispose();
@@ -163,12 +169,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
           final isFirstMessageOfTheDay = isLastMessage
               ? true
-              : _messages[i]
-                      .message
-                      .createdAt!
-                      .difference(_messages[i + 1].message.createdAt!)
-                      .inDays !=
-                  0;
+              : !_isSameDay(_messages[i].message.createdAt!,
+                  _messages[i + 1].message.createdAt!);
+
+          print(isFirstMessageOfTheDay);
 
           return Column(
             children: [
@@ -190,7 +194,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
-        color: AppColors.instance.notMyMessageColor,
+        color: AppColors.instance.dateHeaderBackgroundColor,
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Padding(
