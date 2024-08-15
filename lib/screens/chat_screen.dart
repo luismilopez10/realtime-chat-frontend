@@ -172,8 +172,6 @@ class _ChatScreenState extends State<ChatScreen> {
               : !_isSameDay(_messages[i].message.createdAt!,
                   _messages[i + 1].message.createdAt!);
 
-          print(isFirstMessageOfTheDay);
-
           return Column(
             children: [
               if (isLastMessage) const SizedBox(height: 8.0),
