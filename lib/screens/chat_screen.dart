@@ -217,7 +217,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final now = DateTime.now().toLocal();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
-    final aWeekAgo = today.subtract(const Duration(days: 7));
+    final aWeekAgo = today.subtract(const Duration(days: 6));
 
     final wasSentToday = today.year == messageDate.year &&
         today.month == messageDate.month &&
