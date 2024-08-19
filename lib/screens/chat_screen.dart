@@ -162,24 +162,29 @@ class _ChatScreenState extends State<ChatScreen> {
       child: ListView.builder(
         itemCount: _messages.length,
         itemBuilder: (_, i) {
-          bool isFirstMessage = i == 0;
           bool isLastMessage = i == _messages.length - 1;
+
+          final currentMessage = _messages[i];
+          final nextMessage = !isLastMessage ? _messages[i + 1] : null;
+
+          bool isFirstMessage = i == 0;
           bool isNextMessageFromDifferentUser = !isLastMessage &&
-              _messages[i].message.from != _messages[i + 1].message.from;
+              currentMessage.message.from != nextMessage!.message.from;
 
           final isFirstMessageOfTheDay = isLastMessage
               ? true
-              : !_isSameDay(_messages[i].message.createdAt!,
-                  _messages[i + 1].message.createdAt!);
+              : !_isSameDay(currentMessage.message.createdAt!,
+                  nextMessage!.message.createdAt!);
 
           return Column(
             children: [
-              if (isLastMessage) const SizedBox(height: 8.0),
+              // if (isLastMessage) const SizedBox(height: 8.0),
               if (isFirstMessageOfTheDay)
-                _buildDateHeader(_messages[i].message.createdAt!, locale),
-              if (isNextMessageFromDifferentUser) const SizedBox(height: 8.0),
+                _buildDateHeader(currentMessage.message.createdAt!, locale),
+              if (isNextMessageFromDifferentUser && !isFirstMessageOfTheDay)
+                const SizedBox(height: 8.0),
               _messages[i],
-              if (isFirstMessage) const SizedBox(height: 8.0),
+              if (isFirstMessage) const SizedBox(height: 4.0),
             ],
           );
         },
@@ -196,13 +201,13 @@ class _ChatScreenState extends State<ChatScreen> {
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
         child: Text(
           _getMessageDate(date, locale),
           style: TextStyle(
-            color: AppColors.instance.dateHeaderTextColor,
-            fontSize: 12.0,
-          ),
+              color: AppColors.instance.dateHeaderTextColor,
+              fontSize: 14.0,
+              fontWeight: FontWeight.w500),
         ),
       ),
     );
@@ -210,21 +215,29 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String _getMessageDate(DateTime messageDate, Locale locale) {
     final today = DateTime.now().toLocal();
-    final isSentToday = today.difference(messageDate).inDays == 0;
-    final isSentYesterday = today.difference(messageDate).inDays == 1;
-    final isSentWithinLastWeek = today.difference(messageDate).inDays < 6;
+    final yesterday = today.subtract(const Duration(days: 1));
+    final aWeekAgo = today.subtract(const Duration(days: 7));
 
-    if (isSentToday) {
+    final wasSentToday = today.year == messageDate.year &&
+        today.month == messageDate.month &&
+        today.day == messageDate.day;
+    final wasSentYesterday = yesterday.year == messageDate.year &&
+        yesterday.month == messageDate.month &&
+        yesterday.day == messageDate.day;
+    final wasSentWithinLastWeek = messageDate.isAfter(aWeekAgo);
+
+    if (wasSentToday) {
       return 'Hoy';
-    } else if (isSentYesterday) {
+    } else if (wasSentYesterday) {
       return 'Ayer';
-    } else if (isSentWithinLastWeek) {
-      return DateFormat('EEEE', locale.toString()).format(messageDate);
+    } else if (wasSentWithinLastWeek) {
+      String dayOfWeek =
+          DateFormat('EEEE', locale.toString()).format(messageDate);
+      return dayOfWeek[0].toUpperCase() + dayOfWeek.substring(1);
     }
 
     return DateFormat('d \'de\' MMMM \'de\' yyyy', locale.toString())
-        .format(messageDate)
-        .toLowerCase();
+        .format(messageDate);
   }
 
   Widget _buildInputChat() {
@@ -232,7 +245,8 @@ class _ChatScreenState extends State<ChatScreen> {
       children: [
         Container(
           color: Colors.transparent,
-          margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
+          margin: const EdgeInsets.only(
+              left: 6.0, top: 3.0, right: 6.0, bottom: 6.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -276,10 +290,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Container _buildTextField() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+      padding: const EdgeInsets.symmetric(vertical: 11.0, horizontal: 10.0),
       decoration: BoxDecoration(
         color: AppColors.instance.textFieldBackgroundColor,
-        borderRadius: BorderRadius.circular(20.0),
+        borderRadius: BorderRadius.circular(30.0),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -289,7 +303,7 @@ class _ChatScreenState extends State<ChatScreen> {
           //* Caja de texto del mensaje
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(top: 2.0, bottom: 2.0, right: 8.0),
+              padding: const EdgeInsets.only(top: 0.0, bottom: 0.0, right: 8.0),
               child: Scrollbar(
                 thickness: 3.0,
                 child: Padding(
@@ -307,7 +321,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     style: TextStyle(
                       height: 1.25,
                       color: AppColors.instance.textColor,
-                      fontSize: 17.0,
+                      fontSize: 20.0,
                     ),
                     decoration: InputDecoration.collapsed(
                       hintText: 'Mensaje',

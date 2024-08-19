@@ -47,24 +47,26 @@ class _MessageContainer extends StatelessWidget {
 
   double _getTextFontSize(String text) {
     if (!_isOnlyEmojis(text)) {
-      return 15.0;
+      return 18.0;
     }
 
     switch (text.runes.length) {
       case 1:
         return 32.0;
       case 2:
-        return 22.0;
+        return 24.0;
       case 3:
-        return 20.0;
+        return 22.0;
       default:
-        return 17.0;
+        return 19.0;
     }
   }
 
   Size _getTextSize(String text, TextStyle style, double maxWidth) {
+    TextStyle updatedStyle = style.copyWith(fontSize: style.fontSize! + 2);
+
     final textPainter = TextPainter(
-      text: TextSpan(text: text, style: style),
+      text: TextSpan(text: text, style: updatedStyle),
       maxLines: null,
       textDirection: ui.TextDirection.ltr,
     )..layout(maxWidth: maxWidth);
@@ -77,27 +79,27 @@ class _MessageContainer extends StatelessWidget {
     return emojiMatches.length == text.runes.length;
   }
 
-  String _getFormattedTime(DateTime dateTime) {
-    return DateFormat.jm()
-        .format(dateTime)
-        .replaceAll('AM', 'a.m.')
-        .replaceAll('PM', 'p.m.');
-  }
-
   @override
   Widget build(BuildContext context) {
-    const maxBubbleWidth = 330.0;
-    const timeWidth = 60.0;
+    final screenSize = MediaQuery.sizeOf(context);
+    final maxBubbleWidth = screenSize.width * 0.8;
+    const messageTimeFontSize = 14.0;
 
-    final textStyle = TextStyle(
+    final messageTextStyle = TextStyle(
       color: AppColors.instance.textColor,
       fontSize: _getTextFontSize(message.message!),
     );
 
-    final textSize = _getTextSize(message.message!, textStyle, maxBubbleWidth);
+    final messageTimeStyle = TextStyle(
+      color: AppColors.instance.messageTimeTextColor,
+      fontSize: messageTimeFontSize,
+    );
+
+    final textSize =
+        _getTextSize(message.message!, messageTextStyle, maxBubbleWidth);
     final timeSize = _getTextSize(
       _getFormattedTime(message.createdAt!),
-      const TextStyle(fontSize: 14.0),
+      messageTimeStyle,
       double.infinity,
     );
 
@@ -107,10 +109,11 @@ class _MessageContainer extends StatelessWidget {
         // && textSize.width != maxBubbleWidth
         ;
 
+    //* Burbuja que contiene el mensaje
     return Align(
       alignment: isMyMessage ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: maxBubbleWidth),
+        constraints: BoxConstraints(maxWidth: maxBubbleWidth),
         decoration: BoxDecoration(
           color: isMyMessage
               ? AppColors.instance.myMessageColor
@@ -119,34 +122,36 @@ class _MessageContainer extends StatelessWidget {
         ),
         child: Stack(
           children: [
+            //* Texto del mensaje
             Padding(
               padding: EdgeInsets.only(
                 left: 10.0,
-                // right: 10.0,
-                right: isTextOverlappingTime ? 10.0 : 75.0,
-                top: 6.0,
-                // bottom: 6.0,
-                bottom: isTextOverlappingTime ? 24.0 : 6.0,
+                right: isTextOverlappingTime ? 10.0 : timeSize.width + 10.0,
+                top: 4.0,
+                bottom: isTextOverlappingTime ? timeSize.height + 7.0 : 7.0,
               ),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
+                constraints: BoxConstraints(
                   maxWidth: maxBubbleWidth,
                 ),
                 child: Text(
                   message.message!,
-                  style: textStyle,
+                  style: messageTextStyle,
                 ),
               ),
             ),
+
+            //* Hora del mensaje
             Positioned(
               bottom: 3.0,
               right: 8.0,
               child: _HourAndCheck(
                 message: message,
                 isMyMessage: isMyMessage,
-                constraints: const BoxConstraints(
-                  minWidth: timeWidth,
-                  maxWidth: timeWidth,
+                fontSize: messageTimeFontSize,
+                constraints: BoxConstraints(
+                  minWidth: timeSize.width,
+                  maxWidth: timeSize.width,
                 ),
               ),
             ),
@@ -160,11 +165,13 @@ class _MessageContainer extends StatelessWidget {
 class _HourAndCheck extends StatelessWidget {
   final Message message;
   final bool isMyMessage;
+  final double fontSize;
   final BoxConstraints constraints;
 
   const _HourAndCheck({
     required this.message,
     required this.isMyMessage,
+    required this.fontSize,
     required this.constraints,
   });
 
@@ -179,7 +186,7 @@ class _HourAndCheck extends StatelessWidget {
             _getFormattedTime(message.createdAt!),
             style: TextStyle(
               color: AppColors.instance.messageTimeTextColor,
-              fontSize: 12.0,
+              fontSize: fontSize,
             ),
           ),
           // if (isMyMessage)
@@ -192,11 +199,11 @@ class _HourAndCheck extends StatelessWidget {
       ),
     );
   }
+}
 
-  String _getFormattedTime(DateTime dateTime) {
-    return DateFormat.jm()
-        .format(dateTime)
-        .replaceAll('AM', 'a.m.')
-        .replaceAll('PM', 'p.m.');
-  }
+String _getFormattedTime(DateTime dateTime) {
+  return DateFormat.jm()
+      .format(dateTime)
+      .replaceAll('AM', 'a.m.')
+      .replaceAll('PM', 'p.m.');
 }
