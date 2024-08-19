@@ -214,7 +214,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   String _getMessageDate(DateTime messageDate, Locale locale) {
-    final today = DateTime.now().toLocal();
+    final now = DateTime.now().toLocal();
+    final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
     final aWeekAgo = today.subtract(const Duration(days: 7));
 
