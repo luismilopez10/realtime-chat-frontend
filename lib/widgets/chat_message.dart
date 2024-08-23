@@ -45,6 +45,13 @@ class _MessageContainer extends StatelessWidget {
     required this.isMyMessage,
   });
 
+  bool _isOnlyEmojis(String text) {
+    final emojiRegExp = emojiRegex();
+    final emojiMatches = emojiRegExp.allMatches(text);
+
+    return emojiMatches.length == text.runes.length;
+  }
+
   double _getTextFontSize(String text) {
     if (!_isOnlyEmojis(text)) {
       return 18.0;
@@ -62,21 +69,39 @@ class _MessageContainer extends StatelessWidget {
     }
   }
 
-  Size _getTextSize(String text, TextStyle style, double maxWidth) {
-    TextStyle updatedStyle = style.copyWith(fontSize: style.fontSize! + 2);
+  _TextMetrics _getLastLineWidth(
+      String text, TextStyle style, double maxWidth) {
+    TextStyle updatedStyle = style.copyWith(fontSize: style.fontSize! + 2.0);
 
+    // Crear un TextPainter para medir el texto
     final textPainter = TextPainter(
       text: TextSpan(text: text, style: updatedStyle),
       maxLines: null,
       textDirection: ui.TextDirection.ltr,
     )..layout(maxWidth: maxWidth);
-    return textPainter.size;
-  }
 
-  bool _isOnlyEmojis(String text) {
-    final emojiRegExp = emojiRegex();
-    final emojiMatches = emojiRegExp.allMatches(text);
-    return emojiMatches.length == text.runes.length;
+    // Obtener el número total de líneas
+    final int totalLines = textPainter.computeLineMetrics().length;
+
+    // Calcular el offset del inicio de la última línea
+    final lastLineStartOffset = textPainter.getPositionForOffset(
+      Offset(0, (totalLines - 1) * textPainter.preferredLineHeight),
+    );
+
+    // Calcular el offset del final de la última línea
+    final lastLineEndOffset = textPainter.getPositionForOffset(
+      Offset(maxWidth, (totalLines - 1) * textPainter.preferredLineHeight),
+    );
+
+    // Calcular el ancho de la última línea
+    final lastLineWidth =
+        textPainter.getOffsetForCaret(lastLineEndOffset, Rect.zero).dx -
+            textPainter.getOffsetForCaret(lastLineStartOffset, Rect.zero).dx;
+
+    return _TextMetrics(
+      textSize: Size(lastLineWidth, textPainter.preferredLineHeight),
+      totalLines: totalLines,
+    );
   }
 
   @override
@@ -85,29 +110,51 @@ class _MessageContainer extends StatelessWidget {
     final maxBubbleWidth = screenSize.width * 0.8;
     const messageTimeFontSize = 14.0;
 
+    //* -TextStyles- MessageText y MessageDate
     final messageTextStyle = TextStyle(
       color: AppColors.instance.textColor,
       fontSize: _getTextFontSize(message.message!),
     );
-
     final messageTimeStyle = TextStyle(
       color: AppColors.instance.messageTimeTextColor,
       fontSize: messageTimeFontSize,
     );
 
-    final textSize =
-        _getTextSize(message.message!, messageTextStyle, maxBubbleWidth);
-    final timeSize = _getTextSize(
+    //* Tamaños de los textos
+    final timeWidth = _getLastLineWidth(
       _getFormattedTime(message.createdAt!),
       messageTimeStyle,
       double.infinity,
     );
+    final textLastLineWidth =
+        _getLastLineWidth(message.message!, messageTextStyle, maxBubbleWidth);
 
-    final isTextOverlappingTime =
-        (textSize.width + timeSize.width) > (maxBubbleWidth - 30.0)
-        // && (textSize.width) < (maxBubbleWidth - 1.0)
-        // && textSize.width != maxBubbleWidth
-        ;
+    //* Total de ancho
+    final totalLastLineWidth =
+        (textLastLineWidth.textSize.width + timeWidth.textSize.width);
+
+    //* Solapamiento de textos
+    final double rightPadding;
+    final double bottomPadding;
+
+    switch (textLastLineWidth.totalLines) {
+      case 1:
+        if (totalLastLineWidth > maxBubbleWidth) {
+          rightPadding = 10.0;
+          bottomPadding = 24.0;
+        } else {
+          rightPadding = timeWidth.textSize.width + 10.0;
+          bottomPadding = 7.0;
+        }
+        break;
+      default:
+        rightPadding = 10.0;
+        if (totalLastLineWidth > maxBubbleWidth) {
+          bottomPadding = 24.0;
+        } else {
+          bottomPadding = 7.0;
+        }
+    }
 
     //* Burbuja que contiene el mensaje
     return Align(
@@ -126,9 +173,9 @@ class _MessageContainer extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(
                 left: 10.0,
-                right: isTextOverlappingTime ? 10.0 : timeSize.width + 10.0,
+                right: rightPadding,
                 top: 4.0,
-                bottom: isTextOverlappingTime ? timeSize.height + 7.0 : 7.0,
+                bottom: bottomPadding,
               ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -150,8 +197,8 @@ class _MessageContainer extends StatelessWidget {
                 isMyMessage: isMyMessage,
                 fontSize: messageTimeFontSize,
                 constraints: BoxConstraints(
-                  minWidth: timeSize.width,
-                  maxWidth: timeSize.width,
+                  minWidth: timeWidth.textSize.width,
+                  maxWidth: timeWidth.textSize.width,
                 ),
               ),
             ),
@@ -206,4 +253,14 @@ String _getFormattedTime(DateTime dateTime) {
       .format(dateTime)
       .replaceAll('AM', 'a.m.')
       .replaceAll('PM', 'p.m.');
+}
+
+class _TextMetrics {
+  final Size textSize;
+  final int totalLines;
+
+  _TextMetrics({
+    required this.textSize,
+    required this.totalLines,
+  });
 }
