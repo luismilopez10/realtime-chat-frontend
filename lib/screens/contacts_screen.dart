@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'package:realtime_chat/app_colors.dart';
 import 'package:realtime_chat/helpers/custom_page_route.dart';
 import 'package:realtime_chat/models/user.dart';
+import 'package:realtime_chat/providers/chat_settings_provider.dart';
 import 'package:realtime_chat/screens/chat_screen.dart';
 import 'package:realtime_chat/screens/login_screen.dart';
 import 'package:realtime_chat/services/auth_service.dart';
 import 'package:realtime_chat/services/socket_service.dart';
 import 'package:realtime_chat/services/users_service.dart';
+import 'package:realtime_chat/share_preferences/share_preferences.dart';
 import 'package:realtime_chat/widgets/widgets.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -70,8 +72,35 @@ class _ContactsScreenState extends State<ContactsScreen> {
             AuthService.deleteToken();
           },
         ),
-        actions: const [
-          ConnectionStatusIcon(),
+        actions: [
+          const ConnectionStatusIcon(),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'Small') {
+                Preferences.userFontSize = UserFontSize.Small;
+              } else if (value == 'Medium') {
+                Preferences.userFontSize = UserFontSize.Medium;
+              }
+              else if (value == 'Large') {
+                Preferences.userFontSize = UserFontSize.Large;
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'Small',
+                child: Text('Small'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Medium',
+                child: Text('Medium'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Large',
+                child: Text('Large'),
+              ),
+            ],
+          ),
         ],
       ),
       body: SmartRefresher(

@@ -6,16 +6,20 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'package:realtime_chat/app_colors.dart';
+import 'package:realtime_chat/providers/chat_settings_provider.dart';
 import 'package:realtime_chat/screens/screens.dart';
 import 'package:realtime_chat/services/auth_service.dart';
 import 'package:realtime_chat/services/chat_service.dart';
 import 'package:realtime_chat/services/socket_service.dart';
+import 'package:realtime_chat/share_preferences/share_preferences.dart';
 
 void main() async {
   AppColors.whatsapp();
   // AppColors.telegram();
 
   WidgetsFlutterBinding.ensureInitialized();
+  await Preferences.init();
+
   // Se Obtiene la configuración regional predeterminada del dispositivo
   String locale = PlatformDispatcher.instance.locale.toString();
   await initializeDateFormatting(locale, null);
@@ -33,6 +37,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => SocketService()),
         ChangeNotifierProvider(create: (_) => ChatService()),
+        ChangeNotifierProvider(create: (_) => ChatSettingsProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:realtime_chat/app_colors.dart';
 import 'package:realtime_chat/models/messages_response.dart';
 import 'package:realtime_chat/models/user.dart';
+import 'package:realtime_chat/providers/chat_settings_provider.dart';
 import 'package:realtime_chat/services/auth_service.dart';
 import 'package:realtime_chat/services/chat_service.dart';
 import 'package:realtime_chat/services/socket_service.dart';
@@ -194,6 +195,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildDateHeader(DateTime date, Locale locale) {
+    final chatSettingsProvider = Provider.of<ChatSettingsProvider>(context);
+    final dateText = _getMessageDate(date, locale);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
@@ -201,12 +205,12 @@ class _ChatScreenState extends State<ChatScreen> {
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         child: Text(
-          _getMessageDate(date, locale),
+          dateText,
           style: TextStyle(
               color: AppColors.instance.dateHeaderTextColor,
-              fontSize: 14.0,
+              fontSize: chatSettingsProvider.getTextFontSize(dateText) - 3.0,
               fontWeight: FontWeight.w500),
         ),
       ),
