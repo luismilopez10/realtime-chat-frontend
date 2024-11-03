@@ -1,16 +1,64 @@
-# realtime_chat
+# Real-Time Chat Application
 
-A new Flutter project.
+This is a real-time chat application built with Flutter for the frontend and Node.js for the backend. The app allows users to send and receive messages in real time using socket-based communication.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- **Real-Time Messaging:** Send and receive messages instantly.
+- **User Authentication:** Secure login and registration functionality.
+- **Chat History:** View previous chat messages.
+- **Responsive UI:** Adaptive layout for different screen sizes.
+- **Customizable Settings:** Adjust font size and other chat settings.
 
-A few resources to get you started if this is your first Flutter project:
+## Tech Stack
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Frontend:** Flutter
+- **Backend:** Node.js
+- **Real-Time Communication:** Sockets (Socket.IO)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Screenshots
+
+### Chat Screen - Sophie's Phone
+![Chat Screen 1](assets\showcase\RealTimeChat-ScreenShot_1.png)
+
+### Chat Screen - Lucas's Phone
+![Chat Screen 2](assets\showcase\RealTimeChat-ScreenShot_2.png)
+
+## Installation
+
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/yourusername/your-repo.git
+    cd your-repo
+    ```
+
+2. **Install dependencies:**
+    ```bash
+    flutter pub get
+    cd backend
+    npm install
+    ```
+
+3. **Run the Node.js server:**
+    ```bash
+    node index.js
+    ```
+
+4. **Run the Flutter app:**
+    ```bash
+    flutter run
+    ```
+
+## Usage
+
+- Launch the app and register or log in with your credentials.
+- Start chatting with other users in real time.
+- Customize your chat settings through the settings menu.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a pull request or open an issue for any bugs or feature requests.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.

@@ -101,7 +101,7 @@ class _MessageContainer extends StatelessWidget {
     final timeWidth =
         _getLastLineWidth(formattedTimeText, messageTimeStyle, double.infinity);
     final textLastLineWidth = _getLastLineWidth(
-        message.message!, messageTextStyle, maxBubbleWidth - 30.0);
+        message.message!, messageTextStyle, maxBubbleWidth);
 
     //* Total de ancho
     final totalLastLineWidth =
@@ -117,12 +117,12 @@ class _MessageContainer extends StatelessWidget {
           messageTextRightPadding = 10.0;
           messageTextBottomPadding = 24.0;
         } else {
-          messageTextRightPadding = timeWidth.textSize.width + 20.0;
+          messageTextRightPadding = timeWidth.textSize.width + 15.0;
           messageTextBottomPadding = 7.0;
         }
         break;
       default:
-        messageTextRightPadding = 10.0;
+        messageTextRightPadding = 20.0;
         if (totalLastLineWidth > maxBubbleWidth) {
           messageTextBottomPadding = 24.0;
         } else {

@@ -232,9 +232,9 @@ class _ChatScreenState extends State<ChatScreen> {
     final wasSentWithinLastWeek = messageDate.isAfter(aWeekAgo);
 
     if (wasSentToday) {
-      return 'Hoy';
+      return 'Today';
     } else if (wasSentYesterday) {
-      return 'Ayer';
+      return 'Yesterday';
     } else if (wasSentWithinLastWeek) {
       String dayOfWeek =
           DateFormat('EEEE', locale.toString()).format(messageDate);

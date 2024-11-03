@@ -75,14 +75,13 @@ class _ContactsScreenState extends State<ContactsScreen> {
         actions: [
           const ConnectionStatusIcon(),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert, color: Colors.white),
             onSelected: (value) {
               if (value == 'Small') {
                 Preferences.userFontSize = UserFontSize.Small;
               } else if (value == 'Medium') {
                 Preferences.userFontSize = UserFontSize.Medium;
-              }
-              else if (value == 'Large') {
+              } else if (value == 'Large') {
                 Preferences.userFontSize = UserFontSize.Large;
               }
             },
